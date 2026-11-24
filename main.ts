@@ -251,40 +251,45 @@ hline(M, 116, CW, INK, 3);
 rect(M, 128, CW, 46, INK);
 drawTextCentered(140, "TUESDAY 24 NOVEMBER 2026", 3, WHITE);
 hline(M, 182, CW, INK, 2);
-drawTextCentered(196, "MORNING EDITION - ROUND 1", 2, GREY);
+drawTextCentered(196, "FULL-DAY EDITION - ROUND 2", 2, GREY);
 
 // ---- lead story ----
 const leadY = 232;
 drawText(M, leadY, "LEAD STORY", 2, RED);
 hline(M, leadY + 22, CW, RED, 2);
-const leadHead = "RUSSIAN JETS TRIGGER SHELTER ALERT IN SOUTH KOREA";
+const leadHead = "NATO VOWS TO DEFEND SPACE AS RUSSIA READIES NUCLEAR-ARMED SATELLITE";
 let y = leadY + 38;
 y = textBlock(M, y, leadHead, CW, 3, INK, 7 * 3 + 6);
 y += 10;
 const leadBody =
-  "SEVERAL RUSSIAN MILITARY AIRCRAFT ENTERED SOUTH KOREA'S AIR DEFENCE ZONE OVER THE EAST SEA EARLY ON TUESDAY AND APPROACHED ULLEUNGDO ISLAND. THE INTERIOR MINISTRY SENT AN EMERGENCY TEXT AT 07:52 TELLING RESIDENTS OF ULLEUNG COUNTY TO TAKE SHELTER UNDERGROUND OR IN BUILDINGS. FIGHTER JETS WERE SCRAMBLED AND THE ALERT WAS LIFTED AT 07:55, ONCE THE AIRCRAFT HAD LEFT. IT WAS THE FOURTH RUSSIAN ENTRY INTO THE ZONE THIS YEAR.";
+  "NATO CHIEF MARK RUTTE SAID ON TUESDAY THE ALLIANCE WILL DEFEND AGAINST THREATS IN SPACE AFTER REPORTS RUSSIA IS PREPARING TO LAUNCH A NUCLEAR-ARMED SATELLITE, POSSIBLY WITHIN 60 DAYS. MOSCOW WARNED ESTONIA ITS MOVES ARE ON THE VERGE OF TRIGGERING OPEN WAR. GERMANY SIGNED A DEAL IN BERLIN BECOMING THE FIRST COUNTRY TO GET ACCESS TO UKRAINE'S DELTA BATTLEFIELD SYSTEM.";
 // lead text left column, graphic right
 const leadTextW = 560;
 const leadEnd = textBlock(M, y, leadBody, leadTextW, 2, INK, 7 * 2 + 5);
-// graphic: radar map panel
+// graphic: orbit panel - dark space, satellite on an orbit ring above Earth
 const gx = M + leadTextW + 24;
 const gy = y - 6;
 const gw = CW - leadTextW - 24;
-const gh = 190;
+const gh = 170;
 rect(gx, gy, gw, gh, NAVY);
-rect(gx + 4, gy + 4, gw - 8, gh - 8, SKY);
-ring(gx + 150, gy + 95, 62, NAVY, 2);
-ring(gx + 150, gy + 95, 38, NAVY, 2);
-circle(gx + 150, gy + 95, 4, RED);
-// coastline blob (stylised peninsula, kept small on the right edge)
-tri(gx + 268, gy + 44, gx + 322, gy + 66, gx + 292, gy + 140, INK);
-tri(gx + 292, gy + 140, gx + 322, gy + 66, gx + 336, gy + 158, INK);
-// jets: small triangles heading in
-tri(gx + 60, gy + 40, gx + 96, gy + 52, gx + 60, gy + 64, RED);
-tri(gx + 40, gy + 110, gx + 76, gy + 122, gx + 40, gy + 134, RED);
-tri(gx + 90, gy + 140, gx + 126, gy + 152, gx + 90, gy + 164, RED);
-drawText(gx + 12, gy + 8, "KADIZ - EAST SEA", 1, NAVY);
-drawText(gx + 12, gy + gh - 20, "ULLEUNGDO - 07:52 ALERT", 1, NAVY);
+rect(gx + 4, gy + 4, gw - 8, gh - 8, INK);
+// stars
+const stars: Array<[number, number]> = [
+  [30, 22], [70, 48], [120, 18], [180, 40], [230, 24], [290, 52], [330, 20],
+  [52, 96], [140, 78], [210, 92], [260, 70], [310, 100], [90, 130], [200, 140],
+];
+for (const [sx, sy] of stars) rect(gx + sx, gy + sy, 3, 3, WHITE);
+// Earth strip along the bottom of the panel
+rect(gx + 4, gy + gh - 26, gw - 8, 22, SKY);
+// orbit ring
+ring(gx + 170, gy + 78, 74, WHITE, 2);
+// satellite on the ring, upper right
+rect(gx + 218, gy + 22, 34, 16, GOLD);
+rect(gx + 206, gy + 26, 12, 8, SKY);
+rect(gx + 252, gy + 26, 12, 8, SKY);
+rect(gx + 232, gy + 14, 6, 8, RED);
+drawText(gx + 12, gy + 8, "ORBIT - 60 DAYS?", 1, WHITE);
+drawText(gx + 12, gy + gh - 20, "NATO: SPACE IS A FRONT LINE", 1, INK);
 const leadBottom = Math.max(leadEnd, gy + gh) + 8;
 hline(M, leadBottom, CW, INK, 3);
 
@@ -296,7 +301,7 @@ const px0 = M;
 const px1 = M + pw + gap;
 const px2 = M + 2 * (pw + gap);
 
-function panel(x: number, kicker: string, head: string, body: string, art: (ay: number) => void): void {
+function panel(x: number, kicker: string, head: string, body: string, art: (ay: number) => void): number {
   let py = panelY;
   drawText(x, py, kicker, 2, RED);
   hline(x, py + 22, pw, RED, 2);
@@ -305,66 +310,77 @@ function panel(x: number, kicker: string, head: string, body: string, art: (ay: 
   py += 8;
   py = textBlock(x, py, body, pw, 2, INK, 7 * 2 + 5);
   // Art sits below the text, never overlapping it.
-  const artY = Math.max(panelY + 268, py + 12);
+  const artY = Math.max(panelY + 230, py + 10);
   art(artY);
+  return artY + 64;
 }
 
-panel(
+const pb0 = panel(
   px0,
-  "WAR IN UKRAINE",
-  "WAR REACHES DEEP INSIDE RUSSIA",
-  "UKRAINIAN COMBAT DRONES STRUCK THE KALEYKINO OIL FACILITY IN TATARSTAN, MORE THAN 1,200 KM FROM UKRAINIAN TERRITORY. A RUSSIAN STRIKE HIT A VEHICLE EVACUATING CIVILIANS IN KRAMATORSK, KILLING TWO PEOPLE.",
+  "KOREA",
+  "RUSSIAN JETS TRIGGER SHELTER ALERT",
+  "RUSSIAN MILITARY AIRCRAFT ENTERED SOUTH KOREA'S AIR DEFENCE ZONE OVER THE EAST SEA EARLY ON TUESDAY, APPROACHING ULLEUNGDO. AN EMERGENCY TEXT AT 07:52 TOLD RESIDENTS TO SHELTER. FIGHTERS SCRAMBLED; ALERT LIFTED AT 07:55.",
   (ay) => {
     const ax = px0;
-    rect(ax, ay, pw, 92, INK);
-    // flame
-    tri(ax + 40, ay + 78, ax + 70, ay + 18, ax + 100, ay + 78, GOLD);
-    tri(ax + 55, ay + 78, ax + 70, ay + 42, ax + 85, ay + 78, RED);
-    drawText(ax + 118, ay + 30, "KALEYKINO", 2, WHITE);
-    drawText(ax + 118, ay + 54, "1,200 KM", 2, WHITE);
+    rect(ax, ay, pw, 64, NAVY);
+    rect(ax + 4, ay + 4, pw - 8, 56, SKY);
+    ring(ax + 120, ay + 32, 22, NAVY, 2);
+    circle(ax + 120, ay + 32, 4, RED);
+    tri(ax + 36, ay + 16, ax + 66, ay + 26, ax + 36, ay + 36, RED);
+    tri(ax + 200, ay + 40, ax + 230, ay + 50, ax + 200, ay + 60, RED);
+    drawText(ax + 10, ay + 6, "KADIZ - EAST SEA", 1, NAVY);
+    drawText(ax + 10, ay + 50, "07:52 ALERT", 1, NAVY);
   }
 );
-panel(
+const pb1 = panel(
   px1,
-  "SYRIA",
-  "LANDMINE KILLS FIVE CHILDREN",
-  "A LANDMINE BLAST IN NORTHWEST SYRIA KILLED FIVE CHILDREN, REPORTED EARLY ON TUESDAY.",
+  "MEXICO",
+  "EL CHAPO ISIDRO TO BE TRIED AT HOME",
+  "A US SURVEILLANCE DRONE FLEW OVER MEXICAN TERRITORY TO HELP CAPTURE FAUSTO ISIDRO MEZA FLORES, KNOWN AS EL CHAPO ISIDRO, IN SINALOA. MEXICO WILL TRY HIM AT HOME DESPITE A US EXTRADITION REQUEST.",
   (ay) => {
     const ax = px1;
-    rect(ax, ay, pw, 92, PAPER);
-    rect(ax, ay, pw, 92, INK); // border only via inner fill below
-    rect(ax + 2, ay + 2, pw - 4, 88, PAPER);
-    tri(ax + pw / 2 - 42, ay + 76, ax + pw / 2, ay + 12, ax + pw / 2 + 42, ay + 76, GOLD);
-    drawText(ax + pw / 2 - 6, ay + 34, "!", 3, INK);
-    drawTextCentered(ay + 80, "NORTHWEST SYRIA", 1, INK, ax, ax + pw);
+    rect(ax, ay, pw, 64, INK);
+    drawText(ax + 14, ay + 8, "SINALOA", 2, WHITE);
+    drawText(ax + 14, ay + 28, "DRONE AIDED", 2, GOLD);
+    drawText(ax + 14, ay + 48, "THE CAPTURE", 2, WHITE);
+    tri(ax + pw - 70, ay + 12, ax + pw - 30, ay + 32, ax + pw - 70, ay + 52, RED);
   }
 );
-panel(
+const pb2 = panel(
   px2,
-  "CHESS",
-  "WORLD TITLE MATCH BEGINS IN GENEVA",
-  "GAME 1 OF THE FIDE WORLD CHESS CHAMPIONSHIP STARTS TODAY AT 15:00 CET IN GENEVA. CHAMPION D. GUKESH OF INDIA FACES CHALLENGER JAVOKHIR SINDAROV OF UZBEKISTAN, BOTH 20 - THE YOUNGEST WORLD TITLE MATCH EVER. FOURTEEN GAMES, $2.5 MILLION PRIZE FUND.",
+  "MYANMAR",
+  "UK SANCTIONS FIVE GENERALS",
+  "THE UK SANCTIONED FIVE SENIOR MYANMAR MILITARY LEADERS AFTER THE INTERNATIONAL COURT OF JUSTICE RULED ON 19 NOVEMBER THAT MYANMAR COMMITTED GENOCIDE AGAINST THE ROHINGYA. FOURTEEN COUNTRIES BACK THE RULING.",
   (ay) => {
     const ax = px2;
-    const bs = 80 / 8;
-    const bx = ax + Math.floor((pw - 80) / 2);
-    for (let r = 0; r < 8; r++)
-      for (let c = 0; c < 8; c++)
-        rect(bx + Math.floor(c * bs), ay + Math.floor(r * bs), Math.ceil(bs), Math.ceil(bs), (r + c) % 2 ? INK : WHITE);
-    circle(bx + Math.floor(4 * bs + bs / 2), ay + Math.floor(7 * bs + bs / 2), 5, RED);
-    circle(bx + Math.floor(3 * bs + bs / 2), ay + Math.floor(0 * bs + bs / 2), 5, RED);
+    rect(ax, ay, pw, 64, PAPER);
+    rect(ax, ay, pw, 64, INK);
+    rect(ax + 2, ay + 2, pw - 4, 60, PAPER);
+    drawText(ax + 14, ay + 8, "5 GENERALS", 3, RED);
+    drawText(ax + 14, ay + 30, "SANCTIONED", 3, INK);
+    drawText(ax + 14, ay + 52, "ICJ RULING: 19 NOV", 1, GREY);
   }
 );
 
 // vertical rules between panels
-vline(px1 - gap / 2, panelY, 360, GREY, 1);
-vline(px2 - gap / 2, panelY, 360, GREY, 1);
+vline(px1 - gap / 2, panelY, 330, GREY, 1);
+vline(px2 - gap / 2, panelY, 330, GREY, 1);
+
+// ---- bottom strip: China, Iraq/Nepal, chess ----
+const stripY = Math.max(pb0, pb1, pb2) + 14;
+hline(M, stripY, CW, INK, 3);
+const sy = stripY + 12;
+drawText(px0, sy, "CHINA", 2, RED);
+textBlock(px0, sy + 24, "DEATH FOR SPYING; US BLACKLISTS MEGASPEED.", pw, 2, INK, 7 * 2 + 5);
+drawText(px1, sy, "IRAQ - NEPAL", 2, RED);
+textBlock(px1, sy + 24, "IRAQ TAKES KURDISH FIELDS. 5.6 QUAKE, NEPAL.", pw, 2, INK, 7 * 2 + 5);
+drawText(px2, sy, "CHESS", 2, RED);
+textBlock(px2, sy + 24, "GAME 1, 15:00 CET: GUKESH V SINDAROV.", pw, 2, INK, 7 * 2 + 5);
 
 // footer
-const fy = panelY + 380;
+const fy = stripY + 80;
 hline(M, fy, CW, INK, 2);
 drawTextCentered(fy + 12, "COMPILED FROM REPORTS PUBLISHED ON 24 NOVEMBER 2026", 2, GREY);
-drawTextCentered(fy + 38, "THE WORLD IN ONE DAY - TUESDAY 24 NOVEMBER 2026", 2, INK);
 
 // ---- write ----
 const outDir = process.env.OUTPUT_DIR ?? "/output";
